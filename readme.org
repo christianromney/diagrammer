@@ -102,7 +102,7 @@ This experiment will attempt to convert a plain text description of a system dat
 2. transforming the bulleted list specification into [[https://graphviz.org/doc/info/lang.html][Dot language]] source code
 3. generating a PNG diagram from the Dot source code using [[https://graphviz.org/][Graphviz]]
 *** Source Code
-The source code for this experiment lives in a [[https://jupyter.org/][Jupyter]] (Python) notebook using
+The [[file:diagrammer.ipynb][source code]] for this experiment lives in a [[https://jupyter.org/][Jupyter]] (Python) notebook using
 the LangChain framework.
 
 *** System Description
@@ -202,5 +202,16 @@ digraph DataFlow {
 [[file:diagram.png]]
 
 *** Diagram Result
-
 [[file:diagram.png]]
+
+** Discussion
+This experiment drew from the AlphaCodium research[fn:1] on Flow Engineering which
+claims multi-step processing flows improved code generation performance. The
+authors also found that using bulleted lists as LLM prompt input specifications
+produced better results than plain text.
+
+The diagram illustrated above (actual execution output) /does/ accurately capture
+the intent of the natural language system description.
+
+** References
+[fn:1] [[zotero://select/items/1_S3ABWCBK][Ridnik, Tal, Dedy Kredo, and Itamar Friedman. “Code Generation with AlphaCodium: From Prompt Engineering to Flow Engineering.” arXiv, January 16, 2024. https://doi.org/10.48550/arXiv.2401.08500.]]
