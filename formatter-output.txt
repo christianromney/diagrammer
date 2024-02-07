@@ -1,0 +1,8 @@
+- user sends diagram description (plain text) to the orchestrator service
+- orchestrator service sends prompt (plain text) to formatter LLM
+- formatter LLM sends interaction list (bulleted list) to orchestrator service
+- orchestrator service sends interaction list to diagrammer LLM
+- diagrammer LLM sends diagram source code to orchestrator service
+- orchestrator service sends diagram source code to diagramming tool
+- diagramming tool sends diagram image (PNG) to orchestrator service
+- orchestrator service sends diagram image (PNG) to user

@@ -1,0 +1,193 @@
+* Diagrammer
+Langchain experiments to use LLMs as diagramming assistants.
+
+** Enivronment Setup
+*** Prerequisites
+- [[https://direnv.net/][direnv]] ~brew install direnv~
+- [[https://docs.conda.io/projects/miniconda/en/latest/][miniconda]] ~brew install --cask miniconda~
+*** Global Configuration
+**** direnv layout support
+#+begin_src shell :file ~/.config/direnv/direnvrc
+layout_conda() {
+  local ACTIVATE="/usr/local/Caskroom/miniconda/base/bin/activate"
+
+  if [ -n "$1" ]; then
+    # Explicit environment name from layout command.
+    local env_name="$1"
+    source $ACTIVATE ${env_name}
+  elif (grep -q name: environment.yml); then
+    # Detect environment name from `environment.yml` file in `.envrc` directory
+    source $ACTIVATE `grep name: environment.yml | sed -e 's/name: //' | cut -d "'" -f 2 | cut -d '"' -f 2`
+  else
+    (>&2 echo No environment specified);
+    exit 1;
+  fi;
+}
+#+end_src
+*** General Python Project Directory Configuration
+**** directory
+#+begin_src shell
+mkdir -p ~/src/study/<project-name>
+cd ~/src/study/<project-name>
+git init
+#+end_src
+
+**** conda
+***** Initial Setup
+Conda is used to create isolated per-project Python environments Some
+dependencies (e.g. jupyter) are installed via conda, for most others you can
+just use pip once the relevant conda environment is activated.
+
+#+begin_src shell
+conda create --name <project-name> jupyter
+#+end_src
+***** Maintenance
+Conda's base installation should be updated from time to time.
+#+begin_src shell
+conda update -n base -c defaults conda
+#+end_src
+**** direnv
+direnv is used to set project-specific environment variables. The layout
+capability also gives the ability to automatically activate language-specific
+toolchains per directory.
+
+#+begin_src shell :file .envrc
+export OPENAI_API_KEY=<api-key>
+layout conda <project-name>
+#+end_src
+
+Once the we permit direnv to auto-load the directory's .envrc, it will also automatically activate conda whenever we `cd` into the directory at the terminal.
+
+#+begin_src shell
+direnv allow
+#+end_src
+
+*** LLM Project Dependencies
+**** Common Libraries
+For AI experiments I often use a Jupyter notebook and a few libraries.
+- [[https://www.langchain.com/][LangChain]] :: the defacto framework for developing applications powered by language models
+- [[https://python.langchain.com/docs/langgraph][LangGraph]] :: LangGraph is a library for building stateful, multi-actor applications with LLMs
+- [[https://www.langflow.org/][LangFlow]] :: an easy way to prototype LangChain flows
+- [[https://docs.crewai.com/][CrewAI]] :: framework for orchestrating role-playing, autonomous AI agents
+- [[https://docs.trychroma.com/][ChromaDB]] :: open-source embedding database
+- [[https://weaviate.io/developers/weaviate][Weaviate]] :: an open source, AI-native vector database (Docker)
+**** Incompatibilities
+The latest version of LangFlow seems to be a bit out of date and depends on incompatible versions of various packages:
+
+| Langflow Dependency | Conflicts With   |
+|---------------------+------------------|
+| openai              | langchain-openai |
+| langchain           | crewai           |
+
+
+**** Example Installation
+#+begin_src shell
+pip3 install langchain langgraph langflow chromadb
+#+end_src
+
+*** Running Jupyter
+Once all the dependencies are installed, start a notebook and start experimenting.
+
+#+begin_src shell
+jupyter lab
+#+end_src
+
+One of the first things you'll want to do is click on the 'New' dropdown and
+create a notebook file (ending in .ipnyb) and give it a title.
+
+** System Description
+The text below specifies both the architecture of this experiment and serves as a convenient test input to the application.
+
+#+begin_src text :tangle description.txt
+A user submits a plain text diagram description to the orchestator service. The orchestrator service adds the description to a plain text prompt which it sends to a formatter LLM, which responds with a bulleted list of interactions. The orchestrator service sends that interaction list to a diagrammer llm which responds with diagram source code. The orchestrator service sends the diagram source code to the digramming tool which responds with a PNG diagram image. The orchestrator service returns the diagram image to the user.
+#+end_src
+
+** Formatter Prompt
+
+#+begin_src text :tangle formatter-prompt.txt
+You are a text formatting assistant that converts a plain text descriptions of a software application's data flow into a bulleted interaction list detailing each and every data transfer implied by the description. Each line in the output list should correspond to one leg of the data flow in the form "- <sender> sends <payload> (<format>) to <recipient>", where <sender>, <payload>, <format>, and <recipient> are placeholders for the corresponding items from the plain text description you were given. The payload <format> is optional, and if it is not specified it should be omitted from the list.  For example, if given a description that says, "The user sends a JSON query to the service, the service reads the file location from the database, and the service responds to the user with a PNG image", you should produce a bulleted list with the following three lines:
+- user sends query (JSON) to service
+- database sends file location to service
+- service sends image (PNG) to user
+ #+end_src
+
+** Formatter Output
+This is the output from one sample run:
+
+#+begin_src text :tangle formatter-output.txt
+- user sends diagram description (plain text) to the orchestrator service
+- orchestrator service sends prompt (plain text) to formatter LLM
+- formatter LLM sends interaction list (bulleted list) to orchestrator service
+- orchestrator service sends interaction list to diagrammer LLM
+- diagrammer LLM sends diagram source code to orchestrator service
+- orchestrator service sends diagram source code to diagramming tool
+- diagramming tool sends diagram image (PNG) to orchestrator service
+- orchestrator service sends diagram image (PNG) to user
+#+end_src
+
+** Diagrammer Prompt
+#+begin_src text :tangle diagrammer-prompt.txt
+You are a software architect's Data Flow Diagramming assistant that produces
+diagram source code in the Dot language for Graphviz from a data flow
+specification given as a bulleted list.
+
+Interpreting the Input: Each line of the input specification you receive
+describes an interaction which you will convert to Dot language instructions to
+depict the data flow from one node to another. The input is in the form "-
+<sender> sends <payload> (<format>) to <recipient>", where <sender> and
+<recipient> are placeholders for nodes, and the <payload> and optional
+(<format>) describe the data that is sent between them.
+
+Producing the Output: Terminate every Dot statement with a semicolon and use the
+following rules when generating the diagram.
+
+Diagram Styles:
+- the diagram's background should always be white
+- the diagram should always use the "Roboto Mono" font
+
+Node Shapes for <senders> and <recipients>:
+- use a box as the default node shape
+- use a note shape for documents
+- use a cylinder shape for databases
+- use an oval shape for the user
+
+Node Styles:
+- the colorscheme attribute should be "paired12" for all nodes
+- only specify the colorscheme once (as an attribute of node) so it applies to all node shapes
+- each individual node should reference the ordinal colors in its color attributes
+- all nodes should have a filled style
+- each type of architectural element (process, queue, database, document) should
+have a distinct color
+- all instances of the same element type should use the same, consistent color
+- node text should be the actual text given for the <sender> or <recipient> placeholders
+
+Edge Styles:
+- edges should be labeled with the <format> and (<payload>) if given
+- arrows should always point toward the <recipient>
+#+end_src
+
+** Diagrammer Output
+#+begin_src dot :file diagram.png :tangle diagram.dot :cmdline -Kdot -Tpng
+digraph DataFlow {
+    graph [bgcolor=white];
+    node [fontname="Roboto Mono", colorscheme=paired12, style=filled];
+
+    user [shape=oval, color=1, label="user"];
+    orchestrator_service [shape=box, color=2, label="orchestrator service"];
+    formatter_LLM [shape=box, color=3, label="formatter LLM"];
+    diagrammer_LLM [shape=box, color=4, label="diagrammer LLM"];
+    diagramming_tool [shape=box, color=5, label="diagramming tool"];
+
+    user -> orchestrator_service [label="plain text (diagram description)"];
+    orchestrator_service -> formatter_LLM [label="plain text (prompt)"];
+    formatter_LLM -> orchestrator_service [label="bulleted (list of interactions)"];
+    orchestrator_service -> diagrammer_LLM [label="interaction list"];
+    diagrammer_LLM -> orchestrator_service [label="diagram source code"];
+    orchestrator_service -> diagramming_tool [label="diagram source code"];
+    diagramming_tool -> orchestrator_service [label="PNG (diagram image)"];
+    orchestrator_service -> user [label="PNG (diagram image)"];
+}
+#+end_src
+
+#+RESULTS:
+[[file:diagram.png]]
