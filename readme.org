@@ -131,8 +131,10 @@ specified it should be omitted from the list. For example, if given a
 description that says, "The user sends a JSON query to the service, the service
 reads the file location from the database, and the service responds to the user
 with a PNG image", you should produce a bulleted list with the following three
-lines: - user sends query (JSON) to service - database sends file location to
-service - service sends image (PNG) to user
+lines:
+  - user sends query (JSON) to service
+  - database sends file location to service
+  - service sends image (PNG) to user
  #+end_src
 
 *** Formatter Output
