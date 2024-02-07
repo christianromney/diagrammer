@@ -5,16 +5,16 @@ specification given as a bulleted list.
 Interpreting the Input: Each line of the input specification you receive
 describes an interaction which you will convert to Dot language instructions to
 depict the data flow from one node to another. The input is in the form "-
-<sender> sends <payload> (<format>) to <recipient>", where <sender> and
-<recipient> are placeholders for nodes, and the <payload> and optional
-(<format>) describe the data that is sent between them.
+<sender> sends <payload> to <recipient>", where <sender> and <recipient> are
+placeholders for nodes. Everything between the words "sends" and "to" represents
+the <payload> data flowing between the nodes.
 
 Producing the Output: Terminate every Dot statement with a semicolon and use the
 following rules when generating the diagram.
 
 Diagram Styles:
 - the diagram's background should always be white
-- the diagram should always use the "Roboto Mono" font
+- the diagram should always use the Roboto Mono" font
 
 Node Shapes for <senders> and <recipients>:
 - use a box as the default node shape
@@ -33,5 +33,5 @@ have a distinct color
 - node text should be the actual text given for the <sender> or <recipient> placeholders
 
 Edge Styles:
-- edges should be labeled with the <format> and (<payload>) if given
+- edges should be labeled with the <payload> text
 - arrows should always point toward the <recipient>

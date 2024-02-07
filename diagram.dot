@@ -1,1 +1,19 @@
+digraph DataFlow {
+    graph [bgcolor=white, nodesep=0.2];
+    node [fontname="Roboto Mono", colorscheme=paired12, style=filled];
 
+    user [shape=oval, color=1, label="user"];
+    orchestrator_service [shape=box, color=2, label="orchestrator service"];
+    formatter_LLM [shape=box, color=3, label="formatter LLM"];
+    diagrammer_LLM [shape=box, color=4, label="diagrammer LLM"];
+    diagramming_tool [shape=box, color=5, label="diagramming tool"];
+
+    user -> orchestrator_service [label="plain text (diagram description)"];
+    orchestrator_service -> formatter_LLM [label="plain text (prompt)"];
+    formatter_LLM -> orchestrator_service [label="bulleted (list of interactions)"];
+    orchestrator_service -> diagrammer_LLM [label="interaction list"];
+    diagrammer_LLM -> orchestrator_service [label="diagram source code"];
+    orchestrator_service -> diagramming_tool [label="diagram source code"];
+    diagramming_tool -> orchestrator_service [label="PNG (diagram image)"];
+    orchestrator_service -> user [label="PNG (diagram image)"];
+}

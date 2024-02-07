@@ -161,16 +161,16 @@ specification given as a bulleted list.
 Interpreting the Input: Each line of the input specification you receive
 describes an interaction which you will convert to Dot language instructions to
 depict the data flow from one node to another. The input is in the form "-
-<sender> sends <payload> (<format>) to <recipient>", where <sender> and
-<recipient> are placeholders for nodes, and the <payload> and optional
-(<format>) describe the data that is sent between them.
+<sender> sends <payload> to <recipient>", where <sender> and <recipient> are
+placeholders for nodes. Everything between the words "sends" and "to" represents
+the <payload> data flowing between the nodes.
 
 Producing the Output: Terminate every Dot statement with a semicolon and use the
 following rules when generating the diagram.
 
 Diagram Styles:
 - the diagram's background should always be white
-- the diagram should always use the "Roboto Mono" font
+- the diagram should always use the Roboto Mono" font
 
 Node Shapes for <senders> and <recipients>:
 - use a box as the default node shape
@@ -189,30 +189,30 @@ have a distinct color
 - node text should be the actual text given for the <sender> or <recipient> placeholders
 
 Edge Styles:
-- edges should be labeled with the <format> and (<payload>) if given
+- edges should be labeled with the <payload> text
 - arrows should always point toward the <recipient>
 #+end_src
 
 *** Diagrammer Output
 #+begin_src dot :file diagram.png :tangle diagram.dot :cmdline -Kdot -Tpng
-digraph DataFlow {
-    graph [bgcolor=white];
+digraph G {
+    graph [bgcolor=white]
     node [fontname="Roboto Mono", colorscheme=paired12, style=filled];
 
-    user [shape=oval, color=1, label="user"];
-    orchestrator_service [shape=box, color=2, label="orchestrator service"];
-    formatter_LLM [shape=box, color=3, label="formatter LLM"];
-    diagrammer_LLM [shape=box, color=4, label="diagrammer LLM"];
-    diagramming_tool [shape=box, color=5, label="diagramming tool"];
+    user [shape=oval, color=1];
+    "orchestrator service" [shape=box, color=2];
+    "formatter LLM" [shape=box, color=3];
+    "diagrammer LLM" [shape=box, color=4];
+    "diagramming tool" [shape=box, color=5];
 
-    user -> orchestrator_service [label="plain text (diagram description)"];
-    orchestrator_service -> formatter_LLM [label="plain text (prompt)"];
-    formatter_LLM -> orchestrator_service [label="bulleted (list of interactions)"];
-    orchestrator_service -> diagrammer_LLM [label="interaction list"];
-    diagrammer_LLM -> orchestrator_service [label="diagram source code"];
-    orchestrator_service -> diagramming_tool [label="diagram source code"];
-    diagramming_tool -> orchestrator_service [label="PNG (diagram image)"];
-    orchestrator_service -> user [label="PNG (diagram image)"];
+    user -> "orchestrator service" [label="diagram description (plain text)"];
+    "orchestrator service" -> "formatter LLM" [label="prompt (plain text)"];
+    "formatter LLM" -> "orchestrator service" [label="bulleted list of interactions"];
+    "orchestrator service" -> "diagrammer LLM" [label="interaction list"];
+    "diagrammer LLM" -> "orchestrator service" [label="diagram source code"];
+    "orchestrator service" -> "diagramming tool" [label="diagram source code"];
+    "diagramming tool" -> "orchestrator service" [label="diagram image (PNG)"];
+    "orchestrator service" -> user [label="diagram image (PNG)"];
 }
 #+end_src
 
@@ -228,8 +228,20 @@ claims multi-step processing flows improved code generation performance. The
 authors also found that using bulleted lists as LLM prompt input specifications
 produced better results than plain text.
 
-The diagram illustrated above (actual execution output) /does/ accurately capture
-the intent of the natural language system description.
+The diagram illustrated above (actual execution output) /does/ capture the intent
+of the natural language system description in the specification.
+*** Future Work
+This initial experiment could be extended by
+- evaluating a broader set of inputs and outputs
+- trying other improvement techniques
+  + repeated attempts
+  + fine-tuning with good examples to produce better aesthetics
+  + prompt engineering
+  + having an LLM grade the products
+- direct tool invocation
+- leveraging LangChain Agents or a LangGraph
+- using a cheap, open-source local LLM like Mixtral
+
 
 ** References
 [fn:1] [[https://arxiv.org/pdf/2401.08500.pdf][Ridnik, Tal, Dedy Kredo, and Itamar Friedman. “Code Generation with AlphaCodium: From Prompt Engineering to Flow Engineering.” arXiv, January 16, 2024. https://doi.org/10.48550/arXiv.2401.08500.]]
