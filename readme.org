@@ -214,4 +214,4 @@ The diagram illustrated above (actual execution output) /does/ accurately captur
 the intent of the natural language system description.
 
 ** References
-[fn:1] [[zotero://select/items/1_S3ABWCBK][Ridnik, Tal, Dedy Kredo, and Itamar Friedman. “Code Generation with AlphaCodium: From Prompt Engineering to Flow Engineering.” arXiv, January 16, 2024. https://doi.org/10.48550/arXiv.2401.08500.]]
+[fn:1] [[https://arxiv.org/pdf/2401.08500.pdf][Ridnik, Tal, Dedy Kredo, and Itamar Friedman. “Code Generation with AlphaCodium: From Prompt Engineering to Flow Engineering.” arXiv, January 16, 2024. https://doi.org/10.48550/arXiv.2401.08500.]]
