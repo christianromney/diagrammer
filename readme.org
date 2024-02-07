@@ -97,7 +97,7 @@ create a notebook file (ending in .ipnyb) and give it a title.
 
 ** Experiment
 *** Design
-This experiment will attempt to convert a plain text description of a system data flow into a PNG diagram that visualizes that data flow. We will break the computation up into 3 steps:
+This experiment will attempt to convert a plain text description of a system [[https://en.wikipedia.org/wiki/Data-flow_diagram][Data Flow]] into a PNG diagram that visualizes that data flow. We will break the computation up into 3 steps:
 1. converting the natural language description into a succinct bulleted list (specification)
 2. transforming the bulleted list specification into [[https://graphviz.org/doc/info/lang.html][Dot language]] source code
 3. generating a PNG diagram from the Dot source code using [[https://graphviz.org/][Graphviz]]
