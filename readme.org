@@ -82,7 +82,7 @@ The latest version of LangFlow seems to be a bit out of date and depends on inco
 
 **** Example Installation
 #+begin_src shell
-pip3 install langchain langgraph langflow chromadb
+pip3 install langchain langgraph langchain-openai chromadb
 #+end_src
 
 *** Running Jupyter
