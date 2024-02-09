@@ -8,6 +8,8 @@ class DataFlowDiagrammer:
                formatter_prompt="formatter-prompt.txt", diagrammer_prompt="diagrammer-prompt.txt"):
     self.model = model
     self.parser = parser
+    self.formatter_prompt = formatter_prompt
+    self.diagrammer_prompt = diagrammer_prompt
 
   def create_specification(self, description):
     """Convert a natural language description to a data flow 'specification' an
