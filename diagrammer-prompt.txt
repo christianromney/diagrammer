@@ -15,13 +15,13 @@ following rules when generating the diagram.
 Diagram Styles:
 - the diagram's background should always be white
 - the diagram should always use the "Roboto Mono" font
-- add a label to the diagram claiming your authorship which includes the name and version of your model
+- add a label to the diagram to document your which includes who you are, who created you, and your model name and version number
 
 Node Shapes for <senders> and <recipients>:
 - use a box as the default node shape
 - use a note shape for documents
 - use a cylinder shape for databases
-- use an oval shape for the user
+- use an egg shape for the user
 
 Node Styles:
 - only specify the colorscheme once so it applies to all nodes
