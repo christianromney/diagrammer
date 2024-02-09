@@ -107,15 +107,14 @@ the LangChain framework.
 
 *** System Description
 The text below specifies both the architecture of this experiment and serves as a convenient test input to the application.
-
 #+begin_src text :tangle description.txt
-A user submits a plain text diagram description to the orchestator service. The
-orchestrator service adds the description to a plain text prompt which it sends
-to a formatter LLM, which responds with a bulleted list of interactions. The
-orchestrator service sends that interaction list to a diagrammer llm which
-responds with diagram source code. The orchestrator service sends the diagram
-source code to the digramming tool which responds with a PNG diagram image. The
-orchestrator service returns the diagram image to the user.
+A user submits a plain text diagram description to the orchestator. The
+orchestrator adds the description to a plain text prompt which it sends to a
+formatter LLM, which responds with a bulleted list of interactions called a
+spec. The orchestrator sends that spec to a diagrammer llm which responds with
+diagram source code. The orchestrator sends the diagram source code to the
+digramming tool which responds with a PNG diagram image. Finally, the
+orchestrator returns the diagram image to the user.
 #+end_src
 *** Formatter Prompt
 
@@ -170,7 +169,9 @@ following rules when generating the diagram.
 
 Diagram Styles:
 - the diagram's background should always be white
-- the diagram should always use the Roboto Mono" font
+- the diagram should always use the "Roboto Mono" font
+- only specify the colorscheme once so it applies to the entire diagram
+- the colorscheme should be "paired12"
 
 Node Shapes for <senders> and <recipients>:
 - use a box as the default node shape
@@ -179,8 +180,6 @@ Node Shapes for <senders> and <recipients>:
 - use an oval shape for the user
 
 Node Styles:
-- the colorscheme attribute should be "paired12" for all nodes
-- only specify the colorscheme once (as an attribute of node) so it applies to all node shapes
 - each individual node should reference the ordinal colors in its color attributes
 - all nodes should have a filled style
 - each type of architectural element (process, queue, database, document) should
@@ -191,28 +190,34 @@ have a distinct color
 Edge Styles:
 - edges should be labeled with the <payload> text
 - arrows should always point toward the <recipient>
+- if 2 nodes share multiple edges, they should be colored distinctly
+- the color and fontcolor of an edge must always match
+- use newlines to break long labels
 #+end_src
 
 *** Diagrammer Output
 #+begin_src dot :file diagram.png :tangle diagram.dot :cmdline -Kdot -Tpng
-digraph G {
-    graph [bgcolor=white]
-    node [fontname="Roboto Mono", colorscheme=paired12, style=filled];
+digraph DataFlow {
+    graph [bgcolor=white, fontname="Roboto Mono"];
+    node [colorscheme=paired12, style=filled, fontname="Roboto Mono"];
+    edge [colorscheme=paired12, fontname="Roboto Mono"];
 
-    user [shape=oval, color=1];
-    "orchestrator service" [shape=box, color=2];
-    "formatter LLM" [shape=box, color=3];
-    "diagrammer LLM" [shape=box, color=4];
-    "diagramming tool" [shape=box, color=5];
+    // Nodes
+    user [shape=oval, color=1, label="user"];
+    orchestrator [shape=box, color=2, label="orchestrator"];
+    formatter_LLM [shape=box, color=3, label="formatter LLM"];
+    diagrammer_LLM [shape=box, color=3, label="diagrammer LLM"];
+    diagramming_tool [shape=box, color=3, label="diagramming tool"];
 
-    user -> "orchestrator service" [label="diagram description (plain text)"];
-    "orchestrator service" -> "formatter LLM" [label="prompt (plain text)"];
-    "formatter LLM" -> "orchestrator service" [label="bulleted list of interactions"];
-    "orchestrator service" -> "diagrammer LLM" [label="interaction list"];
-    "diagrammer LLM" -> "orchestrator service" [label="diagram source code"];
-    "orchestrator service" -> "diagramming tool" [label="diagram source code"];
-    "diagramming tool" -> "orchestrator service" [label="diagram image (PNG)"];
-    "orchestrator service" -> user [label="diagram image (PNG)"];
+    // Edges
+    user -> orchestrator [label="diagram description\n(plain text)", color=1, fontcolor=1];
+    orchestrator -> formatter_LLM [label="prompt\n(plain text)", color=2, fontcolor=2];
+    formatter_LLM -> orchestrator [label="spec\n(bulleted list)", color=3, fontcolor=3];
+    orchestrator -> diagrammer_LLM [label="spec", color=4, fontcolor=4];
+    diagrammer_LLM -> orchestrator [label="diagram source code", color=5, fontcolor=5];
+    orchestrator -> diagramming_tool [label="diagram source code", color=6, fontcolor=6];
+    diagramming_tool -> orchestrator [label="diagram image\n(PNG)", color=7, fontcolor=7];
+    orchestrator -> user [label="diagram image\n(PNG)", color=8, fontcolor=8];
 }
 #+end_src
 
@@ -230,18 +235,36 @@ produced better results than plain text.
 
 The diagram illustrated above (actual execution output) /does/ capture the intent
 of the natural language system description in the specification.
-*** Future Work
-This initial experiment could be extended by
+
+*** Formatter Task
+I observed consistently good results from the formatter task given to the LLM
+with its relatively simple prompt.
+
+It would be interesting to compare different degrees of structured output
+formats including plain text, lists, and delimited (csv) or tagged (xml) text.
+
+*** Diagrammer Task
+Early versions of the diagrammer prompt talked about the <payload> and the
+optional (<format>). The diagrammer task had trouble with these instructions,
+often confusing the instructions for the <payload> and the <format>.
+
+I eventually realized those details were only the concern of the formatter and
+that the diagrammer could just treat all the text between the nodes as a
+black-box payload label.
+
+An alternative to having an LLM generate the diagram source code from the spec
+would be to write a small interpreter for a subset of the Dot language.
+
+This would likely improve the predictability, fidelity, and performance of the
+code generation at the expense of human effort.
+
+** Future Work
+This experiment needs some method of evaluating the results and a statistically
+meaningful number of test runs over which to collect performance data.
+
+With that in place, we could compare different tools and approaches, including:
 - evaluating a broader set of inputs and outputs
-- trying other improvement techniques
-  + repeated attempts
-  + fine-tuning with good examples to produce better aesthetics
-  + prompt engineering
-  + having an LLM grade the products
-- direct tool invocation
-- leveraging LangChain Agents or a LangGraph
-- using a cheap, open-source local LLM like Mixtral
-
-
+- trying other fidelity-improving techniques
+- using open-source local LLM
 ** References
 [fn:1] [[https://arxiv.org/pdf/2401.08500.pdf][Ridnik, Tal, Dedy Kredo, and Itamar Friedman. “Code Generation with AlphaCodium: From Prompt Engineering to Flow Engineering.” arXiv, January 16, 2024. https://doi.org/10.48550/arXiv.2401.08500.]]

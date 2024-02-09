@@ -1,19 +1,22 @@
 digraph DataFlow {
-    graph [bgcolor=white, nodesep=0.2];
-    node [fontname="Roboto Mono", colorscheme=paired12, style=filled];
+    graph [bgcolor=white, fontname="Roboto Mono"];
+    node [colorscheme=paired12, style=filled, fontname="Roboto Mono"];
+    edge [colorscheme=paired12, fontname="Roboto Mono"];
 
+    // Nodes
     user [shape=oval, color=1, label="user"];
-    orchestrator_service [shape=box, color=2, label="orchestrator service"];
+    orchestrator [shape=box, color=2, label="orchestrator"];
     formatter_LLM [shape=box, color=3, label="formatter LLM"];
-    diagrammer_LLM [shape=box, color=4, label="diagrammer LLM"];
-    diagramming_tool [shape=box, color=5, label="diagramming tool"];
+    diagrammer_LLM [shape=box, color=3, label="diagrammer LLM"];
+    diagramming_tool [shape=box, color=3, label="diagramming tool"];
 
-    user -> orchestrator_service [label="plain text (diagram description)"];
-    orchestrator_service -> formatter_LLM [label="plain text (prompt)"];
-    formatter_LLM -> orchestrator_service [label="bulleted (list of interactions)"];
-    orchestrator_service -> diagrammer_LLM [label="interaction list"];
-    diagrammer_LLM -> orchestrator_service [label="diagram source code"];
-    orchestrator_service -> diagramming_tool [label="diagram source code"];
-    diagramming_tool -> orchestrator_service [label="PNG (diagram image)"];
-    orchestrator_service -> user [label="PNG (diagram image)"];
+    // Edges
+    user -> orchestrator [label="diagram description\n(plain text)", color=1, fontcolor=1];
+    orchestrator -> formatter_LLM [label="prompt\n(plain text)", color=2, fontcolor=2];
+    formatter_LLM -> orchestrator [label="spec\n(bulleted list)", color=3, fontcolor=3];
+    orchestrator -> diagrammer_LLM [label="spec", color=4, fontcolor=4];
+    diagrammer_LLM -> orchestrator [label="diagram source code", color=5, fontcolor=5];
+    orchestrator -> diagramming_tool [label="diagram source code", color=6, fontcolor=6];
+    diagramming_tool -> orchestrator [label="diagram image\n(PNG)", color=7, fontcolor=7];
+    orchestrator -> user [label="diagram image\n(PNG)", color=8, fontcolor=8];
 }

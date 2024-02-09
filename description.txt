@@ -1,7 +1,7 @@
-A user submits a plain text diagram description to the orchestator service. The
-orchestrator service adds the description to a plain text prompt which it sends
-to a formatter LLM, which responds with a bulleted list of interactions. The
-orchestrator service sends that interaction list to a diagrammer llm which
-responds with diagram source code. The orchestrator service sends the diagram
-source code to the digramming tool which responds with a PNG diagram image. The
-orchestrator service returns the diagram image to the user.
+A user submits a plain text diagram description to the orchestator. The
+orchestrator adds the description to a plain text prompt which it sends to a
+formatter LLM, which responds with a bulleted list of interactions called a
+spec. The orchestrator sends that spec to a diagrammer llm which responds with
+diagram source code. The orchestrator sends the diagram source code to the
+digramming tool which responds with a PNG diagram image. Finally, the
+orchestrator returns the diagram image to the user.

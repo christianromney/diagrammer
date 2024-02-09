@@ -14,7 +14,9 @@ following rules when generating the diagram.
 
 Diagram Styles:
 - the diagram's background should always be white
-- the diagram should always use the Roboto Mono" font
+- the diagram should always use the "Roboto Mono" font
+- only specify the colorscheme once so it applies to the entire diagram
+- the colorscheme should be "paired12"
 
 Node Shapes for <senders> and <recipients>:
 - use a box as the default node shape
@@ -23,8 +25,6 @@ Node Shapes for <senders> and <recipients>:
 - use an oval shape for the user
 
 Node Styles:
-- the colorscheme attribute should be "paired12" for all nodes
-- only specify the colorscheme once (as an attribute of node) so it applies to all node shapes
 - each individual node should reference the ordinal colors in its color attributes
 - all nodes should have a filled style
 - each type of architectural element (process, queue, database, document) should
@@ -35,3 +35,6 @@ have a distinct color
 Edge Styles:
 - edges should be labeled with the <payload> text
 - arrows should always point toward the <recipient>
+- if 2 nodes share multiple edges, they should be colored distinctly
+- the color and fontcolor of an edge must always match
+- use newlines to break avoid long labels
