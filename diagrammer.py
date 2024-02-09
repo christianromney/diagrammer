@@ -4,14 +4,15 @@ from langchain.schema.output_parser import StrOutputParser
 import sys, select
 
 class DataFlowDiagrammer:
-  def __init__(self, model=ChatOpenAI(model="gpt-4-turbo-preview"), parser=StrOutputParser()):
+  def __init__(self, model=ChatOpenAI(model="gpt-4-turbo-preview"), parser=StrOutputParser(),
+               formatter_prompt="formatter-prompt.txt", diagrammer_prompt="diagrammer-prompt.txt"):
     self.model = model
     self.parser = parser
 
   def create_specification(self, description):
     """Convert a natural language description to a data flow 'specification' an
     LLM has been prompted to understand."""
-    format_instructions = open("formatter-prompt.txt", "r")
+    format_instructions = open(self.formatter_prompt, "r")
     spec_prompt =  ChatPromptTemplate.from_messages([
       ("system", format_instructions.read()),
       ("user", "Convert the following data flow description to an interaction list: {description}")
@@ -21,7 +22,7 @@ class DataFlowDiagrammer:
 
   def generate_dot_diagram(self, spec):
     "Generate a diagram from a (bulleted list) interaction specification."
-    diagram_instructions = open("diagrammer-prompt.txt", "r")
+    diagram_instructions = open(self.diagrammer_prompt, "r")
     diagram_prompt = ChatPromptTemplate.from_messages([
       ("system", diagram_instructions.read()),
       ("user", "Diagram the following data flow: {spec}")
