@@ -7,10 +7,9 @@ Langchain experiments to use LLMs as diagramming assistants.
 - [[https://docs.conda.io/projects/miniconda/en/latest/][miniconda]] ~brew install --cask miniconda~
 *** Global Configuration
 **** direnv layout support
-#+begin_src shell :file ~/.config/direnv/direnvrc
+#+begin_src shell :mkdirp yes :tangle ~/.config/direnv/direnvrc
 layout_conda() {
-  local ACTIVATE="/usr/local/Caskroom/miniconda/base/bin/activate"
-
+  local ACTIVATE="$(brew config | grep PREFIX | cut -d' ' -f2)/Caskroom/miniconda/base/bin/activate"
   if [ -n "$1" ]; then
     # Explicit environment name from layout command.
     local env_name="$1"
@@ -51,9 +50,9 @@ direnv is used to set project-specific environment variables. The layout
 capability also gives the ability to automatically activate language-specific
 toolchains per directory.
 
-#+begin_src shell :file .envrc
+#+begin_src shell :tangle no :file .envrc
 export OPENAI_API_KEY=<api-key>
-layout conda <project-name>
+layout conda <project-namqe>
 #+end_src
 
 Once the we permit direnv to auto-load the directory's .envrc, it will also automatically activate conda whenever we `cd` into the directory at the terminal.
