@@ -48,7 +48,8 @@ conda update -n base -c defaults conda
 **** direnv
 direnv is used to set project-specific environment variables. The layout
 capability also gives the ability to automatically activate language-specific
-toolchains per directory.
+toolchains per directory. In order to keep my API key safe, I use [[https://github.com/AGWA/git-crypt][git-crypt]] to
+transparently en/decrypt the .envrc file.
 
 #+begin_src shell :tangle no :file .envrc
 export OPENAI_API_KEY=<api-key>
