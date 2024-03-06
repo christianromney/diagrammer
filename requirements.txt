@@ -75,7 +75,7 @@ jupyterlab-pygments @ file:///tmp/build/80754af9/jupyterlab_pygments_16014907206
 jupyterlab-widgets @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_2216bjxnmm/croot/jupyterlab_widgets_1700168633331/work
 jupyterlab_server @ file:///private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/abs_57gd4vwlz2/croot/jupyterlab_server_1699555433477/work
 kubernetes==29.0.0
-langchain==0.1.5
+langchain==0.1.11
 langchain-community==0.0.18
 langchain-core==0.1.19
 langchain-openai==0.0.5
